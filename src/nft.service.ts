@@ -957,14 +957,18 @@ export async function getNftInfoByCollectionAndId(collectionAddress, id) {
         metaCID = new CID(metaCID);
         console.log(metaCID);
 
-        type = await FileType.fromStream(
-          toStream(
-            ipfs.cat(metaCID, {
-              length: 1000, // or however many bytes you need
-            }),
-          ),
-        );
-        console.log('Metadata field extension get.');
+        const ipfscat = ipfs.cat(metaCID, {
+          length: 1000, // or however many bytes you need
+        });
+        console.log('ipfs cat.');
+
+        const streamRes = toStream(ipfscat);
+
+        console.log('to stream');
+
+        type = await FileType.fromStream(streamRes);
+
+        console.log('Metadata field extension get.', type);
       } else {
         type = {
           ext: metaExt,

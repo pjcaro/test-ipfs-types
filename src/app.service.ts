@@ -5,8 +5,8 @@ import { getNftInfoByCollectionAndId } from './nft.service';
 export class AppService {
   async getHello(): Promise<string> {
     await getNftInfoByCollectionAndId(
-      '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d',
-      1859,
+      '0xec9c519d49856fd2f8133a0741b4dbe002ce211b',
+      5023,
     );
     return 'Hello World!';
   }
