@@ -16,7 +16,9 @@ const fetch = require('node-fetch');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const toStream = require('it-to-stream');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const FileType = require('file-type');
+// const FileType = require('file-type');
+// import { fileTypeStream } from 'file-type';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { create, globSource } = require('ipfs');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -949,24 +951,33 @@ export async function getNftInfoByCollectionAndId(collectionAddress, id) {
       }
       //  console.log("Mata Image Url get.");
 
+      console.log('metaImgAvailable> ', metaImgAvailable);
+
       // In case it was not possible to get the metadata extension before, it gets it from ipfs api, if possible.
       if (metaExt == '') {
-        const ipfs = await create({
-          repo: './jsipfs',
-        });
-        metaCID = new CID(metaCID);
-        console.log(metaCID);
+        await (async () => {
+          const { fileTypeFromStream } = await (eval(
+            'import("file-type")',
+          ) as Promise<typeof import('file-type')>);
 
-        const ipfscat = ipfs.cat(metaCID, {
-          length: 1000, // or however many bytes you need
-        });
-        console.log('ipfs cat.');
+          const { got } = await (eval('import("got")') as Promise<
+            typeof import('got')
+          >);
 
-        const streamRes = toStream(ipfscat);
+          /*
+          const url =
+            'https://ipfs.io/ipfs/QmXwYpfRi5PG22U2opeouhSdhkbdCgSRKSWS2v2CqBUugV';
+*/
 
-        console.log('to stream');
+          console.log('metaImgAvailable> ', metaImgAvailable);
 
-        type = await FileType.fromStream(streamRes);
+          const stream = got.stream(metaImgAvailable);
+
+          console.log('async import');
+
+          const type = await fileTypeFromStream(stream);
+          console.log('type---->', type);
+        })();
 
         console.log('Metadata field extension get.', type);
       } else {
@@ -976,8 +987,8 @@ export async function getNftInfoByCollectionAndId(collectionAddress, id) {
       }
 
       // Gets the size of the metadata image.
-      await downloadImage(metaImgAvailable, '../../image.png');
-      dimensions = sizeOf('../image.png');
+      // await downloadImage(metaImgAvailable, '../../image.png');
+      // dimensions = sizeOf('../image.png');
       console.log('Downloaded and checked image dimensions.');
 
       // Checks if the image is uploaded to ipfs.
